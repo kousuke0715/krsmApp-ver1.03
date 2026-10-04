@@ -1,6 +1,6 @@
 # krsmApp-ver1.03
-# 解説
-# @main
+## 解説
+### @main
 ```modelContainer```で定義している```Reservation```と```BusinessSettings```のデータ設計をSwiftDataで保存、取得できるようにする。
 
 ```SelectView()```で```struct SelectView```を開く。
@@ -19,7 +19,7 @@ struct KrsmaApp:App{
     }
 }
 ```
-# データ設計
+### データ設計
 ```@Model```で```class```を定義する。それによりデータ設計をしている。
 ```
 //データ設計
@@ -48,7 +48,7 @@ class BusinessSettings{
     }
 }
 ```
-# 利用者選択画面
+### 利用者選択画面
 ```NavigationStack```で変容するための土台を作る。そして```NavigationLink```を土台の上に作る。
 
 お客様として利用するボタンを押すと```ContentView```に移動する。
@@ -73,7 +73,7 @@ struct SelectView:View{
     }
 }
 ```
-# 管理者ログイン画面
+### 管理者ログイン画面
 ```private let musterPass="Ykousuke0715"```の部分は```private```は
 
 「```MusterPassView```の中だけで使う。」という意味。
@@ -125,7 +125,7 @@ struct MusterPassView: View {
     }
 }
 ```
-# 管理者編集画面
+### 管理者編集画面
 ```@Query```は「SwiftDataに保存されているデータを取り出して、そのViewで使えるようにする。」という意味。
 
 例えば```@Query private var records:[Reservation]```では、```@Query```でSwiftDataから```Reservation```を取ってきてそれを```private```でこの画面内で使える形にして```var```で情報を変更できるようにしている。それを```records```という配列に```Reservation```というデータを入れる。
@@ -153,7 +153,81 @@ DatePicker(
             .datePickerStyle(.graphical)
 ```
 ```DatePicker```カレンダーから日付データを取得します。```selection:$searchDate```でどこに選択した日付を入れるかを決めて```displayedComponents:[.date]```でカレンダーから日付だけを取得する。```.datePickerStyle(.graphical)```これでページを開いている間は永続的にカレンダーを表示する。
+```
+Button("検索") {
+                showResult = true
+            }
+            if showResult {
+                Text("検索結果")
+                List {
+                    ForEach(records) { reservation in
+                        if Calendar.current.isDate(
+                            reservation.dateTime,
+                            inSameDayAs: searchDate
+                        ) {
 
+                            VStack(alignment: .leading) {
+                                Text(
+                                    reservation.dateTime,
+                                    format: .dateTime
+                                        .hour()
+                                        .minute()
+                                )
+                                Text("名前：\(reservation.name)")
+                                Text("メニュー：\(reservation.service)")
+                            }
+                        }
+                    }
+                }
+            }
+```
+ボタンを押すと```showResult```が```true```になり、それにより検索内容が出力される。
+```List{```は一覧表示するための箱で```ForEach(records){reservation in```で```python```でいうところのfor文と同じでPythonだと
+
+```for reservation in records```になる。
+
+```
+if Calendar.current.isDate(
+    reservation.dateTime,
+    inSameDayAs: searchDate
+)
+```
+
+```Calendar.current```は日付の比較や計算をできるようにする。そして```.isDate(```で比較する。```reservation.dateTime```は予約データで```searchDate```は検索データです。その二つを```inSameDayAs:```で同じ日かどうかで比較していく。
+
+日付が同じであれば
+```
+VStack(alignment: .leading) {
+                                Text(
+                                    reservation.dateTime,
+                                    format: .dateTime
+                                        .hour()
+                                        .minute()
+                                )
+                                Text("名前：\(reservation.name)")
+                                Text("メニュー：\(reservation.service)")
+```
+を実行する。
+```VStack(alignment:.leading)```は```VStack```の中に入っている```VStack```を横方向にどこへそろえるかを指定している。```leading```で左揃えにしている。
+
+```
+.task {
+            if settings.isEmpty {
+                let setting = BusinessSettings(
+                    holiday: 2,
+                    startTime: 9,
+                    endTime: 18
+                )
+                modelContext.insert(setting)
+            }
+        }
+    }
+}
+```
+```.task{```はViewが表示されてから実行する処理。
+
+```if settings.isEmpty{```は```settings```が空だと実行するという意味。そのあとに```
+let setting=BusinessSettings(```をsettingに入れてそれを```modelContext.insert(setting)```で挿入する。
 
 ```
 //管理者編集画面
@@ -215,6 +289,8 @@ struct MusterView: View {
         }
     }
 }
+### 店舗設定
+
 //店舗設定
 struct SettingsEditView: View {
     @Bindable var setting: BusinessSettings
