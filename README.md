@@ -147,7 +147,7 @@ DatePicker(
             )
             .datePickerStyle(.graphical)
 ```
-```DatePicker```カレンダーから日付データを取得します。```selection:$searchDate```でどこに選択した日付を入れるかを決めて```displayedComponents:[.date]```でカレンダーから日付だけを取得する。```.datePickerStyle(.graphical)"""これでページを開いている間は永続的にカレンダーを表示する。
+```DatePicker```カレンダーから日付データを取得します。```selection:$searchDate```でどこに選択した日付を入れるかを決めて```displayedComponents:[.date]```でカレンダーから日付だけを取得する。```.datePickerStyle(.graphical)```これでページを開いている間は永続的にカレンダーを表示する。
 
 
 ```
