@@ -1,5 +1,6 @@
 # krsmApp-ver1.03
 # 解説
+# @main
 ```modelContainer```で定義している```Reservation```と```BusinessSettings```のデータ設計をSwiftDataで保存、取得できるようにする。
 
 ```SelectView()```で```struct SelectView```を開く。
@@ -18,6 +19,7 @@ struct KrsmaApp:App{
     }
 }
 ```
+# データ設計
 ```@Model```で```class```を定義する。それによりデータ設計をしている。
 ```
 //データ設計
@@ -46,6 +48,7 @@ class BusinessSettings{
     }
 }
 ```
+# 利用者選択画面
 ```NavigationStack```で変容するための土台を作る。そして```NavigationLink```を土台の上に作る。
 
 お客様として利用するボタンを押すと```ContentView```に移動する。
@@ -70,6 +73,7 @@ struct SelectView:View{
     }
 }
 ```
+# 管理者ログイン画面
 ```private let musterPass="Ykousuke0715"```の部分は```private```は
 
 「```MusterPassView```の中だけで使う。」という意味。
@@ -121,6 +125,7 @@ struct MusterPassView: View {
     }
 }
 ```
+# 管理者編集画面
 ```@Query```は「SwiftDataに保存されているデータを取り出して、そのViewで使えるようにする。」という意味。
 
 例えば```@Query private var records:[Reservation]```では、```@Query```でSwiftDataから```Reservation```を取ってきてそれを```private```でこの画面内で使える形にして```var```で情報を変更できるようにしている。それを```records```という配列に```Reservation```というデータを入れる。
