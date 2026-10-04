@@ -289,8 +289,10 @@ struct MusterView: View {
         }
     }
 }
+```
 ### 店舗設定
 
+```
 //店舗設定
 struct SettingsEditView: View {
     @Bindable var setting: BusinessSettings
@@ -319,8 +321,9 @@ struct SettingsEditView: View {
         }
     }
 }
-            
-
+```
+### 利用者予約日時画面    
+```
 //利用者予約日時画面
 struct ContentView:View{
     @Query private var records:[Reservation]
@@ -367,6 +370,9 @@ struct ContentView:View{
         .padding()
     }
 }
+```
+### 時間予約
+```
 //時間予約
 struct DetailHourMinView:View{
     @Query private var settings:[BusinessSettings]
@@ -432,10 +438,9 @@ struct DetailHourMinView:View{
     }
 }
 }
-
-
-
-
+```
+### サービスの選択
+```
 struct CutDetailSelectView: View {
     // 前の画面から受け取った日時
     let selectedDate: Date
