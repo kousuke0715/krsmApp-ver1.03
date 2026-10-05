@@ -291,7 +291,15 @@ struct MusterView: View {
 }
 ```
 ### 店舗設定
-
+```@Bindable var setting:BusinessSettings```は「SwiftDateからとってきた```BusinessSettings```の中身を、この画面から編集できるようにする。」という意味。
+```
+TextField(
+                "休日設定",
+                value: $setting.holiday,
+                format: .number
+            )
+```
+```value:$setting.holiday,```はSwiftDateの中の```BusinessSettings```の中の```holiday```の値をデータ型として```format:.number```で定義する。
 ```
 //店舗設定
 struct SettingsEditView: View {
@@ -322,7 +330,30 @@ struct SettingsEditView: View {
     }
 }
 ```
-### 利用者予約日時画面    
+### 利用者予約日時画面  
+```@Query private var records:[Reservation]```ではSwiftDateから```Reservation```を画面内で使えるようにしている。
+
+```@State```で```selectedDate```で予約日時を選択する。それをデータ型にする。
+
+```
+var isBooked:Bool{
+        records.contains{reservation in
+            Calendar.current.isDate(
+                reservation.dateTime,
+                equalTo:selectedDate,
+                toGranularity:.minute
+            )
+        }
+```
+```var isBooked:Bool{```は```isBooked```という名前でデータ型としては```Bool```なのでtrueかfalseで返す。
+
+```records.contains{reservation in```の```records```はSwiftDateから持ってきた配列そして```.contains```は配列の中に条件が合うものが一件でもあるかを確かめるもの。そこでtrue,falseを選択する。
+
+```Calendar.current.isDate```はデータを日付計算できる形にして```.isDate```で比較するようにする。
+
+for文を回しているので```reservation.dateTime```を```selectedDate```と比較するそれを```toGranularity:.minute```により分単位で同じものかどうかを見る。
+
+
 ```
 //利用者予約日時画面
 struct ContentView:View{
