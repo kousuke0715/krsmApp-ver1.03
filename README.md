@@ -352,8 +352,44 @@ var isBooked:Bool{
 ```Calendar.current.isDate```はデータを日付計算できる形にして```.isDate```で比較するようにする。
 
 for文を回しているので```reservation.dateTime```を```selectedDate```と比較するそれを```toGranularity:.minute```により分単位で同じものかどうかを見る。
+```
+ DatePicker(
+                "日付を選択",
+                selection:$selectedDate,
+                in:Date()...,
+                displayedComponents:[.date]
+            )
+            .datePickerStyle(.graphical)
+```
+```DatePicker```でカレンダーを表示して日付選択する。```selection:$selectedDate,```で選択したものを```selectedDate```に情報を入れる。```in:Date()...,```で選択できる範囲を決める。```displayedComponents:[.date]```で日付を取り出すようにする。
+```.datePickerStyle(.graphical)```で永続的にカレンダーを表示できるようにする。
+```
+ NavigationLink("時間選択"){
+                DetailHourMinView(selectedDate:$selectedDate)
+            }
+```
+```NavigationLink```で作った時間選択ボタンを押すと```DetailHourMinView```に飛んで日付データを渡す。
+```
+if isBooked{
+                Text("この日時は予約済みです。")
+                    .foregroundStyle(.red)
+            }else{
+                Text("この日時は予約できます。")
+                    .foregroundStyle(.green)
+            }
+```
+```isBooked```で一致するならtrueになり「予約済みです」と表示される。falseなら「予約できます」と表示させる。
 
-
+```
+NavigationLink(){
+                CutDetailSelectView(selectedDate:selectedDate)
+            }label: {
+                    Text("この日時で予約")
+                }
+                .disabled(isBooked)
+                Divider()
+```
+```.disabled(isBooked)```で```isBooked```がtrueならボタンを押せなくなる。ボタンを押したら```CutDetailSelectView```に飛んで```selectedDate```を渡す。
 ```
 //利用者予約日時画面
 struct ContentView:View{
@@ -403,6 +439,132 @@ struct ContentView:View{
 }
 ```
 ### 時間予約
+```@Binding var selectedDate:Date```親画面の内容を子画面でも超苦節変更できるような形で受け取っている。
+```@Environment(\.dismiss) private var dismiss```でSwiftから道具としてdismissを持ってきてdismissはページを閉じるということができる。
+```
+var setting:BusinessSettings?{
+        settings.first
+    }
+```
+```setting```に```BusinessSettings```の1件を入れる。
+```
+var endTime:Date{
+        let calendar=Calendar.current
+        let weekday=calendar.component(
+            .weekday,
+            from:selectedDate
+        )
+```
+```endTime```にDate型で返す。
+
+```let calendar=Calendar.current```で```calendar```という名前でカレンダー機能を使えるようにする。
+```
+let weekday=calendar.component(
+            .weekday,
+            from:selectedDate
+        )
+```
+では```「weekday```に```selectedDate```の曜日情報を入れる。」という意味。
+
+```
+var hour=setting?.endTime ?? 18
+        if weekday == 1 || weekday == 7 {
+            hour=17
+        }
+        return calendar.date(
+            bySettingHour:hour,
+            minute:0,
+            second:0,
+            of:selectedDate
+        )!
+```
+```var hour=setting?.endTime ?? 18```の店舗設定のsettingがあればendTimeを使うていう意味。もしなければ18時間とする。
+```if weekday ==1 || weekday == 7{```だったらhour=17となる土日のみを5時までに設定する。その設定した時間が```endTime```とする。
+```
+return calendar.date(
+            bySettingHour:hour,
+            minute:0,
+            second:0,
+            of:selectedDate
+        )!
+```
+```bySettinfHour:hour```で時間を終了時間のhourにしてmin,secondを０にして```of:selectedDate```でその日付の終了時間を決める。
+
+```
+var weekday:Int{
+        Calendar.current.component(
+            .weekday,
+            from:selectedDate
+        )
+    }
+```
+```weekday```にInt型で```selectedDate```の曜日を代入。
+```
+var holidays:Int{
+        setting?.holiday??2
+    }
+```
+休みの設定をsettingのholidayの存在すれば代入する。
+```
+var startTime: Date {
+    let calendar = Calendar.current
+    let hour = setting?.startTime ?? 9
+    return calendar.date(
+        bySettingHour: hour,
+        minute: 0,
+        second: 0,
+        of: selectedDate
+    )!
+```
+```let calendar = Calendar.current```で```calendar```を使いカレンダー機能を使えるようにする。```let hour = setting?.startTime ?? 9```では、```setting?.startTime??9```で```setting```の```startTime```があればhourになるがなければ9になる。
+```
+return calendar.date(
+        bySettingHour: hour,
+        minute: 0,
+        second: 0,
+        of: selectedDate
+    )!
+```
+hourに0分0秒を合体させたものを```selectedDate```を合体させて```startTime```に代入する。
+```
+var body:some View{
+        if weekday == holidays{
+            Text("休日")
+            Button("終了"){
+                dismiss()
+            }
+        }
+        else{
+            DatePicker(
+                "時間を選択",
+                selection:$selectedDate,
+                in:startTime...endTime,
+                displayedComponents:[.hourAndMinute]
+            )
+            Button("戻る"){
+                dismiss()
+            }
+        }
+    }
+```
+もし```weekday```と```holidays```が一致すれば休日となりページを終了する。
+```
+        else{
+            DatePicker(
+                "時間を選択",
+                selection:$selectedDate,
+                in:startTime...endTime,
+                displayedComponents:[.hourAndMinute]
+            )
+            Button("戻る"){
+                dismiss()
+            }
+        }
+    }
+```
+先ほどの条件以外ならば```DatePicker```で選択範囲を表示。```in:startTime...endTime<```を範囲として扱う。
+```displayedComponents:[.hourAndMinute]```で時間と分を選択させる。それにより```selectedDate```を書き換えると戻る。
+
 ```
 //時間予約
 struct DetailHourMinView:View{
